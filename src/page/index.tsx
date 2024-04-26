@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import { CesiumHeatmap, HeatmapPoint } from "../source";
 import { Button, Col, Row, Slider } from "antd";
-
+import { demoData } from "./data";
 let cesiumHeatmap: CesiumHeatmap;
 const defaultDataValue: [number, number] = [10, 200];
 const defaultOpacityValue: [number, number] = [0, 1];
@@ -62,7 +62,7 @@ const PHeatMap = (props: any) => {
         new Cartesian3()
       );
       _3DTileset.modelMatrix = Matrix4.fromTranslation(translation);
-      // viewer.flyTo(_3DTileset)
+      viewer.flyTo(_3DTileset);
       const mouseClickHandler = new ScreenSpaceEventHandler(
         viewer.scene.canvas
       );
@@ -89,25 +89,38 @@ const PHeatMap = (props: any) => {
       response.json().then((data) => {
         if (data) {
           const values: number[] = [];
-          //   for (let i = 0; i < 22; i++) {
-          data.features.forEach(function (feature) {
-            const lon = feature.geometry.coordinates[0];
-            const lat = feature.geometry.coordinates[1];
-            const _value: number = 100 * Math.random();
-            values.push(_value);
+          const myData = demoData;
+          myData.forEach((item) => {
+            values.push(item.value);
             points.push({
-              x: lon,
-              y: lat,
-              value: _value,
+              x: item.lng,
+              y: item.lat,
+              value: item.value,
             });
           });
+          //   for (let i = 0; i < 22; i++) {
+          // data.features.forEach(function (feature) {
+          //   const lon = feature.geometry.coordinates[0];
+          //   const lat = feature.geometry.coordinates[1];
+          //   const _value: number = 100 * Math.random();
+          //   values.push(_value);
+          //   points.push({
+          //     x: lon,
+          //     y: lat,
+          //     value: _value,
+          //   });
+          // });
           //   }
           console.log(values);
         }
+        console.log({ points });
 
         cesiumHeatmap = new CesiumHeatmap(viewer, {
           zoomToLayer: true,
           points,
+          // renderType: "imagery",
+          renderType: "primitive",
+          // renderType: "entity",
           heatmapDataOptions: {
             max: defaultDataValue[1],
             min: defaultDataValue[0],
